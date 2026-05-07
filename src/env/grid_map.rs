@@ -1,0 +1,98 @@
+use std::fmt::Debug;
+use nalgebra::DMatrix;
+use crate::env::{Configuration, Environment};
+
+#[derive(Debug, PartialEq)]
+pub enum MovementType {
+    Cardinal,
+    Diagonal,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct GridCell {
+    pub x: usize,
+    pub y: usize,
+}
+
+impl Configuration for GridCell {}
+
+pub struct GridMap {
+    pub map: DMatrix<u8>,  // DMatrix for runtime-sized matrix
+    pub x_dim: usize,
+    pub y_dim: usize,
+    pub movement_type: MovementType,
+}
+
+impl GridMap {
+    // from_matrix is a constructor, not part of the Environment trait
+    pub fn from_matrix(map: DMatrix<u8>, movement_type: MovementType) -> Self {
+        let y_dim = map.nrows();
+        let x_dim = map.ncols();
+        Self { map, x_dim, y_dim, movement_type }
+    }
+}
+
+impl Environment for GridMap {
+    type Config = GridCell;
+
+    fn is_occupied(&self, cell: &GridCell) -> bool {
+        self.map[(cell.y, cell.x)] > 0
+    }
+
+    fn get_cost(&self, source: &Self::Config, goal: &Self::Config) -> f64 {
+        match self.movement_type {
+            MovementType::Cardinal => {return 1.0_f64;},
+            MovementType::Diagonal => {
+                let dx = source.x.abs_diff(goal.x);
+                let dy = source.y.abs_diff(goal.y);
+
+                if dx + dy == 2 {
+                    return 2.0_f64.sqrt()
+                } else {
+                    return 1.0_f64
+                }
+            }
+        }
+    }
+
+    fn in_bounds(&self, cell: &GridCell) -> bool {
+        cell.x < self.x_dim && cell.y < self.y_dim
+    }
+
+    fn get_neighbors(&self, cell: &GridCell) -> Vec<GridCell> {
+        const CARDINAL: [(i32, i32); 4] = [
+            (0, -1), (-1, 0), (1, 0), (0, 1)
+        ];
+        const DIAGONAL: [(i32, i32); 8] = [
+            (-1,-1), (0,-1), (1,-1),
+            (-1,  0),        (1, 0),
+            (-1,  1), (0,1), (1, 1),
+        ];
+
+        // !TODO Add Pattern matching for cardinal vs diagonal heres
+        // !TODO figure out best way to do cost
+        let offsets: &[(i32, i32)] = match self.movement_type {
+            MovementType::Cardinal => &CARDINAL,
+            MovementType::Diagonal => &DIAGONAL,
+        };
+        
+        let x = cell.x as i32;
+        let y = cell.y as i32;
+
+        offsets.iter().filter_map(|(dx, dy)| {
+            let nx = x + dx;
+            let ny = y + dy;
+
+            if nx < 0 || ny < 0
+                || nx >= self.x_dim as i32
+                || ny >= self.y_dim as i32
+                || self.map[(ny as usize, nx as usize)] > 0
+            {
+                return None;
+            }
+
+            Some(GridCell { x: nx as usize, y: ny as usize })
+        })
+        .collect()
+    }
+}
