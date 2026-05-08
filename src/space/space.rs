@@ -3,7 +3,11 @@ use std::hash::Hash;
 
 pub trait Configuration: Clone + Hash + Eq + Debug {}
 
-pub trait Environment {
+pub trait Metric<const N: usize> {
+    fn coords(&self) -> [f64; N];
+}
+
+pub trait Space {
     type Config: Configuration;
     
     fn get_cost(&self, source: &Self::Config, goal: &Self::Config) -> f64;

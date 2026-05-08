@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::env::{Environment, GridCell, GridMap, MovementType};
+use crate::space::{Space, GridCell, GridMap, MovementType};
     use nalgebra::DMatrix;
 
     #[test]
@@ -61,5 +61,39 @@ mod tests {
 
         assert!(grid_map.in_bounds(&config_in));
         assert!(!grid_map.in_bounds(&config_out));
+    }
+
+    #[test]
+    fn test_get_neighbors_diagonal() {
+        // Construct 9x9 zero matrix
+        let m = DMatrix::<u8>::zeros(3, 3);
+
+        // Create a Gridmap from the Matrix
+        let grid_map = GridMap::from_matrix(m.clone(), MovementType::Diagonal);
+
+        let corner = GridCell { x: 0, y: 0 };
+        let corner_n: Vec<GridCell> = grid_map.get_neighbors(&corner);
+        assert!(corner_n.len() == 3);
+
+        let mid = GridCell { x: 1, y: 1 };
+        let mid_n: Vec<GridCell> = grid_map.get_neighbors(&mid);
+        assert!(mid_n.len() == 8);
+    }
+
+    #[test]
+    fn test_get_neighbors_cardinal() {
+        // Construct 9x9 zero matrix
+        let m = DMatrix::<u8>::zeros(3, 3);
+
+        // Create a Gridmap from the Matrix
+        let grid_map = GridMap::from_matrix(m.clone(), MovementType::Cardinal);
+
+        let corner = GridCell { x: 0, y: 0 };
+        let corner_n: Vec<GridCell> = grid_map.get_neighbors(&corner);
+        assert!(corner_n.len() == 2);
+
+        let mid = GridCell { x: 1, y: 1 };
+        let mid_n: Vec<GridCell> = grid_map.get_neighbors(&mid);
+        assert!(mid_n.len() == 4);
     }
 }

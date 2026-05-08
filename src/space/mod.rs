@@ -1,7 +1,7 @@
-pub mod environment;
+pub mod space;
 pub mod grid_map;
 
-pub use environment::{Environment, Configuration};
+pub use space::{Space, Configuration, Metric};
 pub use grid_map::{GridMap, GridCell, MovementType};
 
 #[cfg(test)]
