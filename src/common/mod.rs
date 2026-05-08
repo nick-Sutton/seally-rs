@@ -1,5 +1,2 @@
-pub mod heuristic;
+pub mod heuristics;
 pub mod min_heap;
-
-#[cfg(test)]
-mod test;

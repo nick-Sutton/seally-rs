@@ -3,8 +3,8 @@ use std::hash::Hash;
 
 pub trait Configuration: Clone + Hash + Eq + Debug {}
 
-pub trait Metric<const N: usize> {
-    fn coords(&self) -> [f64; N];
+pub trait Metric {
+    fn coords(&self) -> Vec<f64>;
 }
 
 pub trait Space {

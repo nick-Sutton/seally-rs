@@ -1,6 +1,3 @@
 pub mod astar;
 
-pub use astar::astar;
-
-#[cfg(test)]
-mod test;
+pub use astar::AStar;

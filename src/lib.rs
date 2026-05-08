@@ -1,3 +1,3 @@
 pub mod space;
 pub mod common;
-pub mod algo; 
+pub mod algo;

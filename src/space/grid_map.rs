@@ -27,9 +27,9 @@ pub struct GridCell {
 
 impl Configuration for GridCell {}
 
-impl Metric<2> for GridCell {
-    fn coords(&self) -> [f64; 2] {
-        [self.x as f64, self.y as f64]
+impl Metric for GridCell {
+    fn coords(&self) -> Vec<f64> {
+        vec![self.x as f64, self.y as f64]
     }
 }
 
@@ -41,8 +41,13 @@ pub struct GridMap {
 }
 
 impl GridMap {
-    // from_matrix is a constructor, not part of the Environment trait
     pub fn from_matrix(map: DMatrix<u8>, movement_type: MovementType) -> Self {
+        let y_dim = map.nrows();
+        let x_dim = map.ncols();
+        Self { map, x_dim, y_dim, movement_type }
+    }
+
+    pub fn from_file(map: DMatrix<u8>, movement_type: MovementType) -> Self {
         let y_dim = map.nrows();
         let x_dim = map.ncols();
         Self { map, x_dim, y_dim, movement_type }
@@ -77,10 +82,6 @@ impl Space for GridMap {
     }
 
     fn get_neighbors(&self, cell: &GridCell) -> Vec<GridCell> {
-
-
-        // !TODO Add Pattern matching for cardinal vs diagonal heres
-        // !TODO figure out best way to do cost
         let offsets: &[(i32, i32)] = self.movement_type.neighbors();
         
         let x = cell.x as i32;
